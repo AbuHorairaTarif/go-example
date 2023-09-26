@@ -76,54 +76,121 @@ import (
 // }
 
 // func sum2(5)
-func facto2(n int) int {
-	facto := 1
+// func facto2(n int) int {
+// 	facto := 1
+// 	for i := 1; i <= n; i++ {
+// 		facto = facto * i
+// 	}
+// 	return facto
+// }
+
+// func facto(n int, ch chan<- int) {
+// 	//ch chan<- int  only send data to channel
+// 	facto := 1
+// 	for i := 1; i <= n; i++ {
+// 		facto = facto * i
+// 	}
+// 	ch <- facto
+// }
+
+func factorial(n int, ch chan<- int) {
+	fact := 1
 	for i := 1; i <= n; i++ {
-		facto = facto * i
+		fact = fact * i
 	}
-	return facto
+	ch <- fact
+
 }
 
-func facto(n int, ch chan<- int) {
-	//ch chan<- int  only send data to channel
-	facto := 1
+func factorial2(n int) int {
+	fact := 1
 	for i := 1; i <= n; i++ {
-		facto = facto * i
+		fact = fact * i
 	}
-	ch <- facto
+	return fact
 }
 
 func main() {
-	var n int
-	ch_data := make(chan int)
-	fmt.Println("Enter Value for search factorial:")
-	fmt.Scan(&n)
-	go facto(n, ch_data)
-	result := <-ch_data
-	fmt.Println("Factorial of\t", n, " is:\t", result)
+	var value, k int
+	ch := make(chan int)
 
-	fmt.Println("\nFactorial Between number 1 to 20 is: ")
+	timeStart := time.Now()
+	for i := 1; i <= 20; i++ {
+		go factorial(i, ch)
+		value = <-ch
+		fmt.Println("Factorial of ", i, "is :", value)
+	}
+
+	fmt.Printf("Using Single goroutine took %s\n", time.Since(timeStart))
+	fmt.Println("Multiple Goroutine: ")
+	timeStart = time.Now()
+	for i := 1; i <= 5; i++ {
+		go factorial(i, ch)
+		value = <-ch
+		fmt.Println("Factorial of ", i, "is :", value)
+	}
+
+	for i := 6; i <= 10; i++ {
+		go factorial(i, ch)
+		value = <-ch
+		fmt.Println("Factorial of 6 to 10 ", i, "is :", value)
+	}
+
+	for i := 11; i <= 15; i++ {
+		go factorial(i, ch)
+		value = <-ch
+		fmt.Println("Factorial of 11 to 15", i, "is :", value)
+	}
+
+	for i := 16; i <= 20; i++ {
+		go factorial(i, ch)
+		value = <-ch
+		fmt.Println("Factorial of 16 to 20", i, "is :", value)
+	}
+
+	fmt.Printf("Using Multiple goroutine took %s\n", time.Since(timeStart))
 
 	fmt.Println("Without using Goroutine")
-	timeStart := time.Now()
-	for j := 1; j <= 20; j++ {
-		result = facto2(j)
+	timeStart = time.Now()
+	for i := 1; i <= 20; i++ {
+		k = factorial2(i)
 
-		fmt.Println("Factorial of ", j, " is\t", result)
+		fmt.Println("Factorial of ", i, " is\t", k)
 	}
 
 	fmt.Printf("Without goroutine took %s\n", time.Since(timeStart))
-	timeStart = time.Now()
 
-	for j := 1; j <= 20; j++ {
-		go facto(j, ch_data)
-		result := <-ch_data
-		fmt.Println("Factorial of \t", j, "is \t: ", result)
-	}
-	fmt.Printf("Using goroutine took %s\n", time.Since(timeStart))
+	// 	var n int
+	// 	ch_data := make(chan int)
+	// 	fmt.Println("Enter Value for search factorial:")
+	// 	fmt.Scan(&n)
+	// 	go facto(n, ch_data)
+	// 	result := <-ch_data
+	// 	fmt.Println("Factorial of\t", n, " is:\t", result)
+
+	// 	fmt.Println("\nFactorial Between number 1 to 20 is: ")
+
+	// 	fmt.Println("Without using Goroutine")
+	// 	timeStart := time.Now()
+	// 	for j := 1; j <= 20; j++ {
+	// 		result = facto2(j)
+
+	// 		fmt.Println("Factorial of ", j, " is\t", result)
+	// 	}
+
+	// 	fmt.Printf("Without goroutine took %s\n", time.Since(timeStart))
+	// 	timeStart = time.Now()
+
+	// 	for j := 1; j <= 20; j++ {
+	// 		go facto(j, ch_data)
+	// 		result := <-ch_data
+	// 		fmt.Println("Factorial of \t", j, "is \t: ", result)
+	// 	}
+	// 	fmt.Printf("Using goroutine took %s\n", time.Since(timeStart))
 
 	// =======================================================conf/start=====================================================
-	// ch := make(chan int, 3)
+	// ch := make(chan int)
+
 	// fmt.Println("Main Go Routine")
 	// ch <- 1 // 1
 	// ch <- 2 // 2
@@ -135,6 +202,8 @@ func main() {
 	// 	ch <- 41 //5
 	// 	ch <- 51 //6
 	// 	ch <- 71 //7
+	// 	tenth := <-ch
+	// 	fmt.Println(tenth)
 	// 	fmt.Println("First Go End")
 	// }()
 
